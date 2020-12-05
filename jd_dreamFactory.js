@@ -142,29 +142,8 @@ function collectElectricity(facId = $.factoryId, help = false, master) {
 }
 
 // 投入电力
-function investElectric() {
-  return new Promise(async resolve => {
-    if (!$.autoCharge) {
-      $.result.push('未打开自动投入');
-      resolve();
-      return;
-    }
-    $.get(
-      taskUrl('userinfo/InvestElectric', `productionId=${$.info.productionInfo.productionId}`),
-      (err, resp, data) => {
-        try {
-          const { msg, data: { investElectric } = {} } = JSON.parse(data);
-          $.log(`\n投入电力: ${investElectric ? investElectric : ''} ${msg}\n${$.showLog ? data : ''}`);
-          $.result.push(`本次投入电力 ${investElectric}`);
-        } catch (e) {
-          $.logErr(e, resp);
-        } finally {
-          resolve();
-        }
-      },
-    );
-  });
-}
+
+
 
 // 初始化任务
 function taskList() {
