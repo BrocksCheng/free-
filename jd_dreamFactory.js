@@ -144,31 +144,26 @@ function collectElectricity(facId = $.factoryId, help = false, master) {
 // 投入电力
 function investElectric() {
   return new Promise(async resolve => {
-    // const url = `/dreamfactory/userinfo/InvestElectric?zone=dream_factory&productionId=${$.productionId}&sceneval=2&g_login_type=1`;
-    $.get(taskurl('userinfo/InvestElectric', `productionId=${$.productionId}`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data.ret === 0) {
-              console.log(`成功投入电力${data.data.investElectric}电力`);
-              message += `【投入电力】投入成功，共计 ${data.data.investElectric} 电力\n`;
-            } else {
-              console.log(`投入失败，${data.msg}`);
-              message += `【投入电力】投入失败，${data.msg}\n`;
-            }
-          }
+    if (!$.autoCharge) {
+      $.result.push('未打开自动投入');
+      resolve();
+      return;
+    }
+    $.get(
+      taskUrl('userinfo/InvestElectric', `productionId=${$.info.productionInfo.productionId}`),
+      (err, resp, data) => {
+        try {
+          const { msg, data: { investElectric } = {} } = JSON.parse(data);
+          $.log(`\n投入电力: ${investElectric ? investElectric : ''} ${msg}\n${$.showLog ? data : ''}`);
+          $.result.push(`本次投入电力 ${investElectric}`);
+        } catch (e) {
+          $.logErr(e, resp);
+        } finally {
+          resolve();
         }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
+      },
+    );
+  });
 }
 
 // 初始化任务
